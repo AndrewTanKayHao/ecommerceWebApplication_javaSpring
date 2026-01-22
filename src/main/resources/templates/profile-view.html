@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <title>Profile</title>
+</head>
+
+<!--Author: Theingi Myint, Nyunt-->
+
+<body>
+<!-- HEADER  -->
+<header>
+    <div class="top-bar">
+        <div id="anounce">📞 +65 1234 5678 | ✉ support@team5shop.com</div>
+        <div class="account-links">
+            <div id="my-account">
+                <img src="/images/vecteezy_profile.png" alt="My Account" class="profile-image">
+                <a href="#">My Account <span> ▾</span></a>
+                <ul>
+                    <li><a th:href="@{/purchasehistory}">Order History</a></li>
+                    <li><a th:href="@{/profile}">Profile</a></li>
+                    <li>
+                        <form th:action="@{/logout}" method="POST">
+                            <button type="submit" class="logout-btn">Logout</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGO + SEARCH  -->
+    <div class="header-main">
+        <a href="/" class="d-flex align-items-center text-decoration-none">
+            <img src="/images/team5.png" alt="Team5 Logo" class="shop-logo me-2" />
+        </a>
+    </div>
+</header>
+<nav id="menu">
+    <ul>
+        <li><a href="/">Home</a></li>
+        <li class="active-menu"><a th:href="@{/cart}">Cart</a></li>
+    </ul>
+</nav>
+<main class="container">
+    <aside class="sidebar">
+        <div class="profile">
+            <div class="profile-pic">
+                <img src="/images/vecteezy_profile.png" alt="My Account" class="customer-image">
+            </div>
+            <div class="profile-bio">
+                <h5 class="customername" th:text="${customer.fullName}"></h5>
+                <small class="customeremail" th:text="${customer.email}"></small>
+            </div>
+            <hr class="profile-divider">
+            <a href="javascript:void(0);"  class="edit-btn" onclick="openEditModal()">
+                <span class="me-3"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm4-3a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM2 13s-1 0-1-1 1-4 7-4 7 3 7 4-1 1-1 1H2zm13-1c0-1-2-3-7-3S1 12 1 13c0 .5.5 1 1 1h12c.5 0 1-.5 1-1z"/></svg></span>
+                <span>Edit Profile</span>
+            </a>
+            <a href="javascript:void(0);" class="password-change-btn" onclick="openPasswordModal()">
+                <span class="me-3"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-key" viewBox="0 0 16 16"><path d="M3 8a5 5 0 1 1 9.995.2A5 5 0 0 1 3 8zm5-4a4 4 0 1 0 0 8A4 4 0 0 0 8 4zm.5 4a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 8.5 8zm-2 0a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 6.5 8zm4 0a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0v-1a.5.5 0 0 1 .5-.5z"/></svg></span>
+                <span>Update Password</span>
+            </a>
+            <div class="action-btn" >
+                <form th:action="@{/logout}" method="post" style="margin:0;">
+                    <button type="submit" class="logout-btn1">
+                        <span>Logout</span>
+                    </button>
+                </form>
+                <form th:action="@{/}">
+                    <button type="submit" class="back-btn">
+                        <span>Back</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </aside>
+    <section class="content">
+        <div class="customer-title">
+            <h1 class="content-title">Customer Profile</h1>
+        </div>
+        <div class="customer-info">
+            <h2 th:text="'Customer ID: ' +${customer.id} "></h2>
+            <table class="info-table">
+                <tr>
+                    <th>Name:</th>
+                    <td th:text="${customer.fullName}">John Doe</td>
+                </tr>
+                <tr>
+                    <th>Email:</th>
+                    <td th:text="${customer.email}">john@example.com</td>
+                </tr>
+                <tr>
+                    <th>Phone:</th>
+                    <td th:text="${customer.phoneNumber}">+65 98765432</td>
+                </tr>
+                <tr>
+                    <th>Address:</th>
+                    <td th:text="${customer.address}">123 Main Street</td>
+                </tr>
+            </table>
+            <div th:if="${error}" class="alert alert-danger mt-5 text-center p-2" style="background-color: orange;" th:text="${error}"></div>
+            <div th:if="${message}" class="alert alert-success mt-5 text-center p-2" style="background-color: orange;" th:text="${message}"></div>
+        </div>
+        <div class="edit-modal" id="editModal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeEditModal()">&times;</span>
+                <h2>Edit Profile</h2>
+                <form th:action="@{/profile/edit}" th:object="${customer}" method="post">
+                    <div class="mb-3">
+                        <label for="fullName" class="form-label">Full Name</label>
+                        <input type="text" id="fullName" th:field="*{fullName}" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Address</label>
+                        <input type="text" id="address" th:field="*{address}" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="mobileNumber" class="form-label">Phone Number</label>
+                        <input type="text" id="mobileNumber" th:field="*{phoneNumber}" class="form-control"  pattern="[0-9]{8}"`
+                               required
+                               oninvalid="this.setCustomValidity('Please enter an 8-digit phone number')"
+                               oninput="this.setCustomValidity('')" />
+                    </div>
+                    <div class="modal-buttons">
+                        <button type="submit" class="save-btn">Save Changes</button>
+                        <a th:href="@{/profile}" class="cancel-btn">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="edit-password" id="editPassword">
+            <div class="password-content">
+                <span class="close-btn" onclick="closePasswordModal()">&times;</span>
+                <h2 class="mb-4 text-center">Change Password</h2>
+                <form th:action="@{/profile/change-password}" method="post">
+                    <div class="mb-3">
+                        <label for="currentPassword" class="form-label">Current Password</label>
+                        <input type="password" id="currentPassword" name="currentPassword" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label">New Password</label>
+                        <input type="password" id="newPassword" name="newPassword" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                        <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required />
+                    </div>
+                    <div class="d-flex justify-content-between mt-4">
+                        <a th:href="@{/profile}" class="btn btn-outline-secondary">Back to Profile</a>
+                        <button type="submit" class="btn btn-primary">Update Password</button>
+                    </div>
+                </form>
+                <div th:if="${errors}" class="alert alert-danger mt-5 text-center p-2" style="background-color: orange;" th:text="${errors}"></div>
+            </div>
+        </div>
+    </section>
+</main>
+<footer>
+    <p>© 2025 TEAM 5 NUS-ISS. All Rights Reserved.</p>
+</footer>
+<script>
+    function openEditModal() {
+        document.getElementById("editModal").style.display = "flex";
+        document.getElementById("editPassword").style.display = "none";
+    }
+    function closeEditModal() {
+        document.getElementById("editModal").style.display = "none";
+    }
+    function openPasswordModal() {
+        document.getElementById("editPassword").style.display = "flex";
+        document.getElementById("editModal").style.display = "none";
+    }
+    function closePasswordModal() {
+        document.getElementById("editPassword").style.display = "none";
+    }
+</script>
+<script th:if="${showPasswordModal}">
+    document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("editPassword").style.display = "flex";
+    });
+</script>
+</body>
+</html>

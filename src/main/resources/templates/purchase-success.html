@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+
+    <title>Success</title>
+</head>
+
+<!--Author: Dang Lam-->
+
+<body>
+    <!-- HEADER  -->
+    <header>
+        <div class="top-bar">
+            <div id="anounce">FREE SHIPPING For All Orders</div>
+            <div class="account-links">
+                <div id="my-account">
+                    <img src="/images/vecteezy_profile.png" alt="My Account" class="profile-image">
+                    <a href="#">My Account <span> ▾</span></a>
+                    <ul>
+                        <li><a th:href="@{/purchasehistory}">Order History</a></li>
+                        <li><a th:href="@{/profile}">My Profile</a></li>
+                        <li>
+                            <form th:action="@{/logout}" method="POST">
+                                <button type="submit" class="logout-btn">Logout</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- LOGO + SEARCH  -->
+        <div class="header-main">
+            <a href="/" class="d-flex align-items-center text-decoration-none">
+                <img src="/images/team5.png" alt="Team5 Logo" class="shop-logo me-2" />
+            </a>
+            <!-- END LOGO + SEARCH  -->
+        </div>
+        <!-- MENU  -->
+        <nav id="menu">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/cart">Cart</a></li>
+                <li><a href="/purchasehistory">Order History</a></li>
+            </ul>
+        </nav>
+        <!-- END MENU  -->
+    </header>
+    <!-- END HEADER  -->
+
+    <!-- CONTENT  -->
+
+    <div class="order-success" style="text-align: center">
+        <h1 class="content-title" style="color:#ff6600" >Thank you!</h1>
+        <h2 class="response-checkout">Order Successful. Now you can check your order in Order History</h2>
+    </div>
+        <!-- Shipping Detail  -->
+        <div class="bottom-content">
+            <div class="checkout-group">
+                <h2>Shipping detail</h2>
+                <div class="form-shipping">
+                    <table>
+                        <tr>
+                            <th>Customer Address</th>
+							<td th:text="${order.customer.address}">N/A</td>
+                        </tr>
+                        <tr>
+                            <th>Customer PhoneNumber</th>
+                            <td th:text="${order.customer.phoneNumber}">+65.848.147</td>
+                        </tr>
+                        <tr>
+                            <th>Customer Name</th>
+                            <td th:text="${order.customer.fullName}">Dang Lam</td>
+                        </tr>
+                        <tr>
+                            <th>Your Payment Method</th>
+							<td th:text="${order.paymentMethod}"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="checkout-group">
+                <h2>Cart Totals</h2>
+                <table>
+                    <tr>
+                        <th>Subtotal</th>
+                        <td th:text="'$' + ${order.orderTotal}">$300.00</td>
+                    </tr>
+                    <tr>
+                        <th>Shipping</th>
+                        <td>FREE</td>
+                    </tr>
+                    <tr>
+                        <th>Tax</th>
+                        <td>$0.00</td>
+                    </tr>
+                    <tr>
+                        <th>Total</th>
+                        <td th:text="'$' + ${order.orderTotal}">$300.00</td>
+                    </tr>
+                </table>
+
+            </div>
+        </div>
+        <!-- end Shipping Detail  -->
+
+    </div>
+    <!-- END CONTENT  -->
+
+    <!-- FOOTER  -->
+    <footer>
+        <p>© 2025 TEAM 5 NUS-ISS. All Rights Reserved.</p>
+    </footer>
+    <!-- END FOOTER  -->
+</body>
+
+</html>

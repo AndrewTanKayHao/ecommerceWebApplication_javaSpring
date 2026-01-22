@@ -1,0 +1,94 @@
+:root {
+    --bg-color: #0E0E10;
+    --text-color:#f8f9fa;
+    --font-family: 'Segoe UI', sans-serif;
+
+    --card-bg:#1a1a1a;
+    --header-text-color: #ccc;
+    --title-color: #f0f0f0;
+    --desc-color: #bbbbbb;
+}
+
+body {
+    background-color:var(--bg-color);
+    color:var(--text-color);
+    padding-top:70px;
+    font-family: var(--font-family), serif;
+}
+
+.navbar {
+    background-color: var(--card-bg) !important;
+}
+
+.brand-logo {
+    height: 30px;
+    display:block;
+}
+
+.dropdown-menu {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+.dropdown-item {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+.card {
+    border:none;
+    border-radius:12px;
+    background-color:var(--card-bg);
+    width: 300px;
+    height: 390px;
+}
+
+.card-header {
+    background-color:transparent;
+    color:var(--header-text-color);
+    font-weight: 500;
+    border-bottom: none;
+}
+
+.card-title, h6 {
+    color:var(--title-color);
+}
+
+.card-text, .custom-muted {
+    color:var(--desc-color);
+}
+
+.card-img-top {
+    height:200px;
+    cursor:pointer;
+}
+
+.btn {
+    border-radius: 15px;
+}
+
+.custom-dark {
+    background-color: var(--card-bg) ;
+    height:40px;
+    color: var(--text-color);
+}
+
+.qty-span{
+    margin: 0 10px;
+    display: inline-block;
+    text-align: center;
+    width: 30px;
+    color: var(--title-color);
+}
+
+::placeholder {
+    color: #bbbbbb;
+    opacity: 1;
+}
+
+::-webkit-input-placeholder {
+    color: #bbbbbb;
+}
+:-ms-input-placeholder {
+    color: #bbbbbb;
+}

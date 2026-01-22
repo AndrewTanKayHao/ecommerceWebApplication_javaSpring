@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Checkout</title>
+	<link rel="stylesheet" th:href="@{/css/main.css}" />
+	<script src="https://js.stripe.com/clover/stripe.js"></script>
+</head>
+
+<!--Author: Dang Lam, Ralph-->
+
+<body>
+	<!-- HEADER  -->
+	    <header>
+	        <div class="top-bar">
+	            <div id="anounce">FREE SHIPPING For All Orders</div>
+	            <div class="account-links">
+					<div id="my-account">
+                        <img src="/images/vecteezy_profile.png" alt="My Account" class="profile-image">
+						<a href="#">My Account <span> ▾</span></a>
+						<ul>
+							<li><a th:href="@{/purchasehistory}">Order History</a></li>
+							<li><a th:href="@{/profile}">My Profile</a></li>
+							<li>
+								<form th:action="@{/logout}" method="POST">
+									<button type="submit" class="logout-btn">Logout</button>
+								</form>
+							</li>
+	                    </ul>
+	                </div>
+	            </div>
+	        </div>
+
+	        <!-- LOGO + SEARCH  -->
+	        <div class="header-main">
+				<a href="/" class="d-flex align-items-center text-decoration-none">
+					<img src="/images/team5.png" alt="Team5 Logo" class="shop-logo me-2" />
+				</a>
+	        <!-- END LOGO + SEARCH  -->
+            </div>
+	        <!-- MENU  -->
+	        <nav id="menu">
+	            <ul>
+	                <li><a href="/">Home</a></li>
+					<li><a href="/cart">Cart</a></li>
+	                <li><a href="/purchasehistory">History Order</a></li>
+	            </ul>
+	        </nav>
+	        <!-- END MENU  -->
+	    </header>
+	    <!-- END HEADER  -->
+
+	    <!-- CONTENT  -->
+
+	        <h1 class="content-title">Your Order</h1>
+
+	        <div class="cart-table">
+	            <table>
+	                <thead>
+	                    <tr>
+	                        <th>Image</th>
+	                        <th>Product</th>
+	                        <th>Price</th>
+	                        <th>Quantity</th>
+	                        <th>Total</th>
+	                    </tr>
+	                </thead>
+	                <tbody>
+	                    <tr th:each="item : ${cart.cartItemList}">
+	                        <td><img th:src="${item.product.imageUrl}" alt="" class="product-img"></td>
+	                        <td th:text="${item.product.name}"></td>
+	                        <td th:text="'$ ' + ${item.product.unitPrice}"></td>
+	                        <td th:text="${item.orderedQuantity}"></td>
+	                        <td th:text="'$ ' + ${item.orderedQuantity * item.product.unitPrice}"></td>
+	                    </tr>
+	                </tbody>
+	            </table>
+	        </div>
+
+	        <!-- Shipping Detail  -->
+	        <div class="bottom-content">
+	            <div class="checkout-group">
+	                <h2>Shipping detail</h2>
+	                <div class="form-shipping">
+	                    <table>
+	                        <tr>
+	                            <th>Customer Address</th>
+	                            <td th:text="${customer.address}"></td>
+	                        </tr>
+	                        <tr>
+	                            <th>Customer PhoneNumber</th>
+	                            <td  th:text="${customer.phoneNumber}"></td>
+	                        </tr>
+	                        <tr>
+	                            <th>Customer Name</th>
+	                            <td th:text="${customer.fullName}"></td>
+	                        </tr>
+	                    </table>
+						<span>Choose your payment method: </span>	
+	                    <form th:action="@{/checkout-cod}" method="POST" class="shipping-form"> 
+	                        <button class="checkout-btn">Cash On Delivery</button>
+	                    </form>
+						<form th:action="@{/checkout-stripe}" method="POST">
+						    <button type="submit" id="checkout-button" class="checkout-btn">Pay by Card</button>
+						</form>
+	                </div>
+	            </div>
+
+	            <div class="checkout-group">
+	                <h2>Cart Total</h2>
+	                <table>
+	                    <tr>
+	                        <th>Subtotal</th>
+	                        <td>$ <span th:text="${cart.cartTotal}"> </span></td>
+	                    </tr>
+	                    <tr>
+	                        <th>Shipping</th>
+	                        <td>FREE</td>
+	                    </tr>
+	                    <tr>
+	                        <th>Tax</th>
+	                        <td>$0.00</td>
+	                    </tr>
+	                    <tr>
+	                        <th>Discount</th>
+	                        <td>$0.00</td>
+	                    </tr>
+	                    <tr>
+	                        <th>Total</th>
+	                        <td>$ <span th:text="${cart.cartTotal}"> </span></td>
+	                    </tr>
+	                </table>
+
+	            </div>
+	        </div>
+	        <!-- end Shipping Detail  -->
+
+	    </div>
+	    <!-- END CONTENT  -->
+
+	    <!-- FOOTER  -->
+	    <footer>
+	        <p>© 2025 TEAM 5 NUS-ISS. All Rights Reserved.</p>
+	    </footer>
+	    <!-- END FOOTER  -->
+</body>
+</html>
