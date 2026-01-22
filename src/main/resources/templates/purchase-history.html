@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+
+    <title>PurchaseHistory</title>
+</head>
+
+<!--Author: Nyunt, Dang Lam-->
+
+
+<body>
+<!-- HEADER  -->
+<header>
+    <div class="top-bar">
+        <div id="anounce">📞 +65 1234 5678 | ✉ support@team5shop.com</div>
+        <div class="account-links">
+            <div id="my-account">
+                <img src="/images/vecteezy_profile.png" alt="My Account" class="profile-image">
+                <a href="#">My Account <span> ▾</span></a>
+                <ul>
+                    <li><a th:href="@{/purchasehistory}">Order History</a></li>
+                    <li><a th:href="@{/profile}">Profile</a></li>
+                    <li>
+                      <form th:action="@{/logout}" method="POST">
+                        <button type="submit" class="logout-btn">Logout</button>
+                      </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGO + SEARCH  -->
+    <div class="header-main">
+      <a href="/" class="d-flex align-items-center text-decoration-none">
+        <img src="/images/team5.png" alt="Team5 Logo" class="shop-logo" />
+      </a>
+        <form th:action="@{|/purchasehistory/searching|}" method="get" class="search-form">
+            <select id="searchtype" class="searchtype" name="searchtype" onchange="toggleStatusOptions()">
+                <option value="All" th:selected="${searchtype == 'All'}">All</option>
+                <option value="Id" th:selected="${searchtype == 'Id'}">OrderID</option>
+                <option value="Date" th:selected="${searchtype == 'Date'}">Date</option>
+                <option value="Status" th:selected="${searchtype == 'Status'}">Status</option>
+            </select>
+
+            <!-- Show input only when not Status -->
+            <input type="text" id="keyword-input" placeholder="Search orders..." name="keyword"
+                   th:if="${searchtype != 'Status'}" />
+
+            <!-- Show radio buttons only when Status -->
+            <select id="status-select" th:if="${searchtype == 'Status'}" class="status-select" name="keyword">
+                <option value="" th:selected="${keyword == null or keyword == ''}">Selected Status</option>
+                <option value="Pending" th:selected="${keyword=='Pending'}">Pending</option>
+                <option value="Delivered" th:selected="${keyword=='Delivered'}">Delivered</option>
+                <option value="Cancelled" th:selected="${keyword=='Cancelled'}">Cancelled</option>
+            </select>
+            <button type="submit">Search</button>
+        </form>
+    </div>
+    <!-- END LOGO + SEARCH  -->
+
+    <!-- MENU  -->
+    <nav id="menu">
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li class="active-menu"><a th:href="@{/cart}">Cart</a></li>
+        </ul>
+    </nav>
+    <!-- END MENU  -->
+</header>
+<!-- END HEADER  -->
+
+<!-- CONTENT  -->
+<section id="container">
+    <h1 class="content-title">Your Order History</h1>
+    <div class="main-content">
+        <div class="order-table" id="order-table">
+            <table id="purchase-table" th:if="${not #lists.isEmpty(orders)}">
+                <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Order Date</th>
+                    <th>Total Price</th>
+                    <th>Status</th>
+                    <th></th>
+                    <th>Order Details</th>
+                </tr>
+                </thead>
+                <tbody id="purchase-body">
+                <tr th:each="order:${orders}">
+                    <td th:text="${order.id}"></td>
+                    <td th:text="${#temporals.format(order.dateTime,'yyyy-MM-dd')}"></td>
+                    <td th:text="'$ ' + ${order.orderTotal}"></td>
+                    <td th:text="${order.status.status}"
+                        th:classappend="${
+         order.status.status == 'Pending' ? 'status-pending' :
+        (order.status.status == 'Delivered' ? 'status-completed' :
+        (order.status.status == 'Cancelled' ? 'status-cancelled' : 'status-default'))
+    }">
+                    <td>
+        <span th:if="${order.status.status == 'Pending'}">
+            <form th:action="@{/purchasehistory/cancel}" method="POST">
+                <input type="hidden" name="orderId" th:value="${order.id}"></input>
+                <button type="submit" class="cancel1-btn" style="background-color:red; padding: 8px"/>Cancel</button>
+            </form>
+            </span>
+                        <span th:if="${order.status.status == 'Delivered'}">
+                <p class="status-completed"><b>Delivered</b></p>
+        </span>
+                        <span th:if="${order.status.status == 'Cancelled'}">
+            <p class="status-cancelled"><b>Cancelled</b></p>
+    </span>
+                    </td>
+
+                    <td>
+                        <a th:href="@{|/purchasehistory/searching/details?orderId=${order.id}&searchtype=${searchtype ?: 'All'}&keyword=${keyword ?: ''}|}">
+                            View Details
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="details-table"  th:if="${details}">
+            <h2 th:text="'Order #' +${selectedOrderId} + ' Details'"></h2>
+            <div class="details-scroll">
+            <table id="orderDetails-table">
+                <thead>
+                <tr>
+                    <th>Product Image</th>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Total Price</th>
+                </tr>
+                </thead>
+                <tbody id="orderDetails-body">
+                <tr th:each="d:${details}">
+                    <td><img class="product-image" th:src="@{${d.product.imageUrl}}" th:alt="${d.product.name}" th:data-name="${d.product.name}" th:data-desc="${d.product.description}"></td>
+                    <td th:text="${d.product.name}"></td>
+                    <td th:text="${d.orderedQuantity}"></td>
+                    <td th:text="'$ ' + ${d.product.unitPrice}" class="price"></td>
+                </tr>
+                </tbody>
+            </table>
+                </div>
+            <div style="text-align: center">
+                <form th:action="@{|/purchasehistory/searching|}" method="get" class="order-details-btn">
+                    <input type="hidden" name="searchtype" th:value="${searchtype}" />
+                    <input type="hidden" name="keyword" th:value="${keyword}" />
+                    <button class="close-btn1" type="submit">Close</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="imagebox" id="imagebox">
+    <div class="imagebox-content">
+        <img id="imagebox-image" alt="Product Image">
+        <div class="imagebox-description">
+            <h4 id="imagebox-name"></h4>
+            <h5>Description</h5>
+            <p id="imagebox-description"></p>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>© 2025 TEAM 5 NUS-ISS. All Rights Reserved.</p>
+</footer>
+<!-- END FOOTER  -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const productImage = document.querySelectorAll('.product-image');
+        const imageBox = document.querySelector('.imagebox');
+        const imageboxImage = document.getElementById('imagebox-image');
+        const nameElement=document.getElementById('imagebox-name');
+        const descriptionElement=document.getElementById('imagebox-description');
+
+        productImage.forEach((img) => {
+            img.addEventListener('click', () => {
+                imageboxImage.src = img.src;
+                nameElement.textContent = img.dataset.name;
+                descriptionElement.textContent = img.dataset.desc;
+                imageBox.style.display = "flex";
+            });
+        });
+        imageboxImage.addEventListener('click', (e) => {
+            imageBox.style.display = "none";
+        });
+        imageBox.addEventListener('click', (e) => {
+            imageBox.style.display = "none";
+        })
+    });
+    function toggleStatusOptions() {
+        const select = document.getElementById('searchtype');
+        const statusDiv = document.getElementById('status-options');
+        const keywordInput = document.getElementById('keyword');
+
+        if (select.value === 'Status') {
+            statusDiv.style.display = 'flex';
+            keywordInput.style.display = 'none';
+        } else {
+            statusDiv.style.display = 'none';
+            keywordInput.style.display = 'inline-block';
+        }
+    }
+</script>
+</body>
+
+</html>

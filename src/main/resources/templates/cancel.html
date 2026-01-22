@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Cancel Checkout</title>
+	<link rel="stylesheet" th:href="@{/css/main.css}" />
+	<script src="https://js.stripe.com/clover/stripe.js"></script>
+
+	<title>Cancel</title>
+</head>
+
+<!--Author: Dang Lam-->
+
+<body>
+	<!-- HEADER  -->
+	<header>
+		<div class="top-bar">
+			<div id="anounce">FREE SHIPPING For All Orders</div>
+			<div class="account-links">
+				<div id="my-account">
+					<img src="/images/vecteezy_profile.png" alt="My Account" class="profile-image">
+					<a href="#">My Account <span> ▾</span></a>
+					<ul>
+						<li><a th:href="@{/purchasehistory}">Order History</a></li>
+						<li><a th:href="@{/profile}">My Profile</a></li>
+						<li>
+							<form th:action="@{/logout}" method="POST">
+								<button type="submit" class="logout-btn">Logout</button>
+							</form>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<!-- LOGO + SEARCH  -->
+		<div class="header-main">
+			<a href="/" class="d-flex align-items-center text-decoration-none">
+				<img src="/images/team5.png" alt="Team5 Logo" class="shop-logo me-2" />
+			</a>
+			<!-- END LOGO + SEARCH  -->
+		</div>
+		<!-- MENU  -->
+		<nav id="menu">
+			<ul>
+				<li><a href="/">Home</a></li>
+				<li><a href="/cart">Cart</a></li>
+				<li><a href="/purchasehistory">Order History</a></li>
+			</ul>
+		</nav>
+		<!-- END MENU  -->
+	</header>
+	<!-- END HEADER  -->
+
+	<!-- CONTENT  -->
+	<div id="container">
+
+		<div class="order-success" style="text-align: center; min-height: 50vh; ">
+			<h1 class="content-title" style="color:#ff6600">Your Order Has Been Cancelled</h1>
+
+			<h2 class="response-checkout" th:text="${message}"> Message </h2>
+		</div>
+
+
+
+	</div>
+	<!-- END CONTENT  -->
+
+	<!-- FOOTER  -->
+	<footer>
+		<p>© 2025 TEAM 5 NUS-ISS. All Rights Reserved.</p>
+	</footer>
+	<!-- END FOOTER  -->
+</body>
+
+</html>

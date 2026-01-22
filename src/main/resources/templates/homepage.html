@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- CSRF -->
+  <meta name="_csrf" th:content="${_csrf.token}" />
+  <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
+  <!-- Bootstrap  -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+    crossorigin="anonymous">
+
+  <!-- Custom Team5 Theme (loads after Bootstrap to override styles) -->
+  <link th:href="@{/css/team5_combined.css}" rel="stylesheet">
+
+  <title>Team5 Stationery</title>
+</head>
+
+<body>
+
+<!--Author: Chee Wee, Angeline, Dang Lam, Andrew-->
+
+
+  <!-- Top Contact & Account Bar -->
+  <div class="top-bar">
+    <div>📞 +65 1234 5678 | ✉ <a href="mailto:support@team5shop.com" style="color: inherit; text-decoration: none;">
+      support@team5shop.com
+    </a></div>
+    <div class="account-links">
+      <!-- Guests -->
+      <a th:href="@{/login}" sec:authorize="!isAuthenticated()">Log In</a>
+      <a th:href="@{/register}" sec:authorize="!isAuthenticated()">Create Account</a>
+
+      <!-- Authenticated -->
+      <div id="my-account" sec:authorize="isAuthenticated()">
+          <img src="/images/vecteezy_profile.png" alt="My Account" class="profile-image">
+          <a href="#">My Account <span> ▾</span></a>
+        <ul>
+          <li><a th:href="@{/purchasehistory}">Order History</a></li>
+          <li><a th:href="@{/profile}">My Profile</a></li>
+          <li>
+            <form th:action="@{/logout}" method="POST">
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="header-main">
+    <a href="/" class="d-flex align-items-center text-decoration-none">
+      <img src="/images/team5.png" alt="Team5 Logo" class="shop-logo me-2" />
+    </a>
+
+    <!-- Search -->
+    <form th:action="@{/search}" method="get" class="search-form">
+      <input type="text" name="keyword" th:value="${keyword}" placeholder="Search products..." />
+      <button type="submit">🔍</button>
+    </form>
+  </header>
+
+  <!-- Navigation Menu -->
+  <nav id="menu">
+    <ul>
+      <li th:classappend="${category==''} ? 'active-menu'">
+        <a th:href="@{/}">All Products</a>
+      </li>
+      <li th:classappend="${category=='Luxury Pens'} ? 'active-menu'">
+        <a th:href="@{/category(category='Luxury Pens')}">Luxury Pens</a>
+      </li>
+      <li th:classappend="${category=='Notebooks & Journals'} ? 'active-menu'">
+        <a th:href="@{/category(category='Notebooks & Journals')}">Notebooks & Journals</a>
+      </li>
+      <li sec:authorize="isAuthenticated()" class="cart-containers">
+        <a th:href="@{/cart(page=${currentPage}, keyword=${keyword}, category=${category})}">🛒 View Cart</a>
+          <span th:text="${sessionCart != null ? #lists.size(sessionCart.cartItemList) : 0}" class="cart-items">0</span>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Product Catalogue -->
+  <main class="product-container">
+    <div class="product-grid" th:if="${products}">
+      <div class="product-card" th:each="product : ${products}">
+          <div class="product-image-wrapper">
+            <img th:src="${product.imageUrl}" alt="Product Image" class="product-image">
+          </div>
+
+          <div class="product-info">
+            <h5 th:text="${product.name}" class="product-name"></h5>
+            <p class="product-price" th:text="'$' + ${product.unitPrice}"></p>
+            <p class="product-desc" th:text="${product.description}"></p>
+          </div>
+
+          <div class="text-center mb-2"
+		       th:id="'cart-' + ${product.id}"
+		       th:attr="data-stock=${product.stockQuantity}">
+
+		    <!-- Logged-in users -->
+		    <div sec:authorize="isAuthenticated()">
+		      <div th:if="${sessionCart != null and sessionCart.hasProduct(product.id)}">
+		        <button class="cart-quantity-btn" th:onclick="'decrease(' + ${product.id} + ')'">−</button>
+		        <input type="number"
+		               th:id="'qty-' + ${product.id}"
+		               class="qty-input"
+		               style="width: 45px; text-align: center;"
+		               min="0"
+		               th:value="${sessionCart.getQtyForProduct(product.id)}"
+		               th:onchange="|updateQty(${product.id}, this.value)|">
+		        <button class="cart-quantity-btn" th:onclick="'increase(' + ${product.id} + ')'">+</button>
+		      </div>
+		      <div th:unless="${sessionCart != null and sessionCart.hasProduct(product.id)}">
+		        <button type="button" th:onclick="'addToCart(' + ${product.id} + ')'">Add to Cart</button>
+		      </div>
+		    </div>
+
+		    <!-- Guests -->
+		    <div sec:authorize="!isAuthenticated()">
+		      <a th:href="@{/login}">
+		        <button type="button">Add to Cart</button>
+		      </a>
+		    </div>
+		  </div>
+
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty product list -->
+    <div th:if="${#lists.isEmpty(products)}" class="text-center mt-5 w-100">
+      <h6 class="text-muted">Product Not Found. Please try again.</h6>
+    </div>
+  </main>
+
+  <!-- Pagination -->
+  <div class="pagination">
+    <a th:if="${currentPage > 1}"
+       th:href="@{/(page=${currentPage - 1}, keyword=${keyword}, category=${category})}">Prev</a>
+    <span th:text="'Page ' + ${currentPage} + ' of ' + ${totalPages}"></span>
+    <a th:if="${currentPage < totalPages}"
+       th:href="@{/(page=${currentPage + 1}, keyword=${keyword}, category=${category})}">Next</a>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2025 Team5 Stationery. All rights reserved.</p>
+  </footer>
+
+  <!-- Bootstrap Bundle (for dropdown functionality) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+    crossorigin="anonymous"></script>
+
+  <!-- Cart Interaction Scripts -->
+  <script th:inline="javascript">
+	function addToCart(id) {
+	  const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+	  const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+	  fetch('/cart/add', {
+	    method: 'POST',
+	    headers: {
+	      'Content-Type': 'application/json',
+	      [csrfHeader]: csrfToken
+	    },
+	    body: JSON.stringify({ id: id })
+	  })
+	  .then(res => res.json())
+	  .then(data => {
+	    if (data.success) {
+	      const cartContainer = document.getElementById('cart-' + id);
+	      if (cartContainer) {
+	        // Set data-stock on container div
+	        cartContainer.setAttribute('data-stock', data.stockQuantity);
+
+	        // Replace inner HTML only
+	        cartContainer.innerHTML = `
+	          <button class="cart-quantity-btn" onclick="decrease(${id})">−</button>
+	          <input type="number"
+	                 id="qty-${id}"
+	                 class="qty-input"
+	                 style="width: 45px; text-align: center;"
+	                 min="0"
+	                 value="${data.cartItemCount}"
+	                 onchange="updateQty(${id}, this.value)">
+	          <button class="cart-quantity-btn" onclick="increase(${id})">+</button>
+	        `;
+			window.location.reload();
+	      }
+	    } else {
+	      alert("Failed to add to cart: " + (data.error || "Unknown error"));
+	    }
+	  })
+	  .catch(err => console.error('Error adding to cart:', err));
+	}
+
+	function decrease(id) {
+	  const input = document.getElementById('qty-' + id);
+	  if (!input) return;
+
+	  let currentQty = parseInt(input.value) || 0;
+	  const newQty = currentQty - 1;
+
+	  updateQty(id, newQty);
+	}
+
+	function increase(id) {
+	  const input = document.getElementById('qty-' + id);
+	  if (!input) return;
+
+	  let currentQty = parseInt(input.value) || 0;
+	  const newQty = currentQty + 1;
+
+	  updateQty(id, newQty);
+	}
+
+	function updateQty(id, newQty) {
+	  const cartDiv = document.getElementById('cart-' + id);
+	  const input = document.getElementById('qty-' + id);
+	  if (!input || !cartDiv) return;
+
+	  const stock = parseInt(cartDiv.getAttribute('data-stock'));
+	  const currentQty = parseInt(input.value);
+
+	  // Treat empty input as 0 (remove item from cart)
+	  if (newQty === "") {
+	    newQty = 0;
+	  }
+
+	  newQty = parseInt(newQty);
+
+	  const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+	  const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+	  // Remove item from cart if qty is 0 or less
+	  if (newQty <= 0) {
+	    fetch('/cart/remove', {
+	      method: 'POST',
+	      headers: {
+	        'Content-Type': 'application/json',
+	        [csrfHeader]: csrfToken
+	      },
+	      body: JSON.stringify({ id: id })
+	    })
+	    .then(res => res.json())
+	    .then(data => {
+	      if (data.success) {
+	        cartDiv.innerHTML = `<button type="button" onclick="addToCart(${id})">Add to Cart</button>`;
+	        window.location.reload();
+	      } else {
+	        alert("Failed to remove from cart: " + (data.error || "Unknown error"));
+	        input.value = currentQty; // revert
+	      }
+	    })
+	    .catch(err => {
+	      console.error('Error removing from cart:', err);
+	      input.value = currentQty; // fallback
+	    });
+
+	    return; // Stop further execution
+	  }
+
+	  // Handle invalid or too low input
+	  if (isNaN(newQty) || newQty < 1) {
+	    alert("Quantity must be 1 or more.");
+	    input.value = currentQty; // revert
+	    return;
+	  }
+
+	  // Handle exceeding stock
+	  if (newQty > stock) {
+	    alert(`Only ${stock} available!`);
+	    input.value = stock;
+	    newQty = stock;
+	  }
+
+	  // Proceed to update quantity
+	  fetch('/cart/update-quantity', {
+	    method: 'POST',
+	    headers: {
+	      'Content-Type': 'application/json',
+	      [csrfHeader]: csrfToken
+	    },
+	    body: JSON.stringify({ id: id, quantity: newQty })
+	  })
+	  .then(res => res.json())
+	  .then(data => {
+	    if (data.success) {
+	      input.value = data.cartItemCount;
+	      input.setAttribute('data-qty', data.cartItemCount);
+	    } else {
+	      alert("Failed to update quantity.");
+	      input.value = currentQty; // fallback
+	    }
+	  })
+	  .catch(err => {
+	    console.error('Error updating quantity:', err);
+	    input.value = currentQty; // fallback
+	  });
+	}
+  </script>
+
+</body>
+</html>

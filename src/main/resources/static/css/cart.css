@@ -1,0 +1,22 @@
+@media (min-width: 1025px) {
+.h-custom {
+height: auto !important;
+}
+}
+
+.card-registration .select-input.form-control[readonly]:not([disabled]) {
+font-size: 1rem;
+line-height: 2.15;
+padding-left: .75em;
+padding-right: .75em;
+}
+
+.card-registration .select-arrow {
+top: 13px;
+}
+
+.btn-dark:hover {
+    background-color: #28a745; /* Default color for success buttons */
+    color: #fff; /* Text color on hover */
+    border-color: #28a745; /* Border color on hover */
+}
